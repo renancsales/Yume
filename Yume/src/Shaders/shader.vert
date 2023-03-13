@@ -5,9 +5,9 @@ layout(location = 1) in vec3 color;
 layout(location = 2) in vec2 texCoords;
 
 layout(set = 0, binding = 0) uniform uboViewProjection {
-	mat4 projection;
-	mat4 view;
-} viewProjectionMtx;
+	mat4 projectionViewMtx;
+	// mat4 view;
+} camera;
 
 // not in use, left for reference
 layout(set = 0, binding = 1) uniform uboModel {
@@ -23,7 +23,7 @@ layout(location = 1) out vec2 fragTex;
 
 void main()
 {
-	gl_Position = viewProjectionMtx.projection * viewProjectionMtx.view * modelMtx.model *vec4(position, 1.0);
+	gl_Position = camera.projectionViewMtx * modelMtx.model *vec4(position, 1.0);
 	out_color = color;
 	fragTex = texCoords;
 }

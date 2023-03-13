@@ -25,6 +25,7 @@
 
 #include "Mesh.h"
 #include "MeshModel.h"
+#include "Scene.h"
 #include "Utils.h"
 
 
@@ -35,182 +36,95 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif
 
+
+
 class VulkanRenderer
 {
 public:
-	VulkanRenderer() = default;
-	~VulkanRenderer() = default;
+	//VulkanRenderer() = default;
+	//VulkanRenderer(const VulkanRenderer&) = default;
+	//VulkanRenderer& operator=(const VulkanRenderer&) = default;
 
-	struct Devices
-	{
-		VkPhysicalDevice PhysicalDevice;
-		VkDevice LogicalDevice;
-	};
+	
 
 public:
-	int Init(GLFWwindow* window);
+	static int Init(GLFWwindow* window);
 
-	void UpdateModel(uint32_t meshObjectIndex, glm::mat4& newModel);
+	static void SetScene();
+	static void SceneUpdate(float ts);
 
-	void Draw();
-	void CleanUp();
+	static void UpdateModel(uint32_t meshObjectIndex, glm::mat4& newModel);
+
+	static void Draw();
+	static void CleanUp();
 
 private:
 	// Create functions
-	void CreateInstance();
-	void CreateLogicalDevice();
-	void CreateSurface();
-	void CreateSwapChain();
-	void CreateRenderPass();
-	void CreateDescriptorSetLayout();
-	void CreateGraphicsPipeline();
-	void CreateDepthBufferImage();
-	void CreateColorBufferImage();
-	void CreateFramebuffers();
-	void CreateCommandPool();
-	void CreateCommandBuffers();
-	void CreateSynchronization();
+	static void CreateInstance();
+	static void CreateLogicalDevice();
+	static void CreateSurface();
+	static void CreateSwapChain();
+	static void CreateRenderPass();
+	static void CreateDescriptorSetLayout();
+	static void CreateGraphicsPipeline();
+	static void CreateDepthBufferImage();
+	static void CreateColorBufferImage();
+	static void CreateFramebuffers();
+	static void CreateCommandPool();
+	static void CreateCommandBuffers();
+	static void CreateSynchronization();
 
-	void CreateTextureSampler();
+	static void CreateTextureSampler();
 
-	void CreateUniformBuffers();
-	void CreateDescriptorPool();
-	void CreateDescriptorSets();
-	void CreateInputDescriptorSets();
+	static void CreateUniformBuffers();
+	static void CreateDescriptorPool();
+	static void CreateDescriptorSets();
+	static void CreateInputDescriptorSets();
 
-	void UpdateUniformBuffers(uint32_t imageIndex);
+	static void UpdateUniformBuffers(uint32_t imageIndex);
 
 	// Record functions
-	void RecordCommands(uint32_t currentImageIndex);
+	static void RecordCommands(uint32_t currentImageIndex);
 
 	// Get functions
-	void GetPhysicalDevice();
+	static void GetPhysicalDevice();
 
 	// - Allocate functions
-	void AllocateDynamicBufferTransferSpace();
+	static void AllocateDynamicBufferTransferSpace();
 
 	// Support functions
 	// -- Check functions
-	bool CheckInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
-	bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
-	bool CheckDeviceSuitable(VkPhysicalDevice device);
+	static bool CheckInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	static bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
+	static bool CheckDeviceSuitable(VkPhysicalDevice device);
 	// -- getter functions
-	QueueFamilyIndices GetQueueFamilies(VkPhysicalDevice device);
-	SwapChainDetails GetSwapChainDetails(VkPhysicalDevice device);
+	static QueueFamilyIndices GetQueueFamilies(VkPhysicalDevice device);
+	static SwapChainDetails GetSwapChainDetails(VkPhysicalDevice device);
 
 
 	// -- pick functions
-	VkSurfaceFormatKHR ChooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
-	VkPresentModeKHR ChooseBestPresentationMode(const std::vector< VkPresentModeKHR>& presentationModes);
-	VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
-	VkFormat ChooseSupportedFormat(const std::vector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlags featureFlags);
+	static VkSurfaceFormatKHR ChooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
+	static VkPresentModeKHR ChooseBestPresentationMode(const std::vector< VkPresentModeKHR>& presentationModes);
+	static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
+	static VkFormat ChooseSupportedFormat(const std::vector<VkFormat>& formats, VkImageTiling tiling, VkFormatFeatureFlags featureFlags);
 
 	// validation layer
-	bool CheckValidationLayerSupport();
+	static bool CheckValidationLayerSupport();
 
 	// -- Create functions
-	VkImage CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+	static VkImage CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
 		VkImageUsageFlags usageFlags, VkMemoryPropertyFlags propFlags, VkDeviceMemory* imageMemory);
-	VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-	VkShaderModule CreateShaderModule(const std::vector<char>& code);
+	static VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+	static VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
-	int CreateTextureImage(const std::string& filepath);
-	int CreateTexture(const std::string& filepath);
-	int CreateTextureDescriptor(VkImageView textureImage);
+	static int CreateTextureImage(const std::string& filepath);
+	static int CreateTexture(const std::string& filepath);
+	static int CreateTextureDescriptor(VkImageView textureImage);
 
-	void CreateMeshModel(const std::string& filepath);
+	static void CreateMeshModel(const std::string& filepath);
 
 	// Loader-functions
-	stbi_uc* LoadTextureFile(const std::string& fileName, int* width, int* height, VkDeviceSize* imageSize);
+	static stbi_uc* LoadTextureFile(const std::string& fileName, int* width, int* height, VkDeviceSize* imageSize);
 
-private:
-	GLFWwindow* m_Window;
-
-	int m_CurrentFrame = 0;
-
-	// Scene objects
-	std::vector<Mesh> m_MeshList;
-	// Scene settings
-	struct Camera {
-		glm::mat4 Projection;
-		glm::mat4 View;
-
-	} m_Camera;
-
-	// -- Vulkan components
-	VkInstance m_Instance;
-	Devices m_MainDevice;
-	VkQueue m_GraphicsQueue;
-	VkQueue m_PresentationQueue;
-
-	VkSurfaceKHR m_Surface;
-	VkSwapchainKHR m_Swapchain;
-
-	std::vector<SwapChainImage> m_SwapChainImages;
-	std::vector<VkFramebuffer> m_SwapChainFramebuffers;
-	std::vector<VkCommandBuffer> m_CommandBuffers;
-
-	// Color buffer image
-	std::vector<VkImage> m_ColorBufferImage;
-	std::vector<VkDeviceMemory> m_ColorBufferImageMemory;
-	std::vector<VkImageView> m_ColorBufferImageView;
-	// depth buffer image
-	std::vector<VkImage> m_DepthBufferImage;
-	std::vector<VkDeviceMemory> m_DepthBufferImageMemory;
-	std::vector<VkImageView> m_DepthBufferImageView;
-	VkFormat m_DepthBufferFormat;
-
-	// Texture sampler
-	VkSampler m_TextureSampler;
-
-	// - Descriptors
-	VkDescriptorSetLayout m_DescriptorSetLayout;
-	VkDescriptorSetLayout m_SamplerDescriptorSetLayout;
-	VkDescriptorSetLayout m_InputDescriptorSetLayout;
-	
-	VkDescriptorPool m_DescriptorPool;
-	VkDescriptorPool m_SamplerDescriptorPool;
-	VkDescriptorPool m_InputDescriptorPool;
-
-	std::vector<VkDescriptorSet> m_DescriptorSets;
-	std::vector<VkDescriptorSet> m_SamplerDescriptorSets;
-	std::vector<VkDescriptorSet> m_InputDescriptorSets;
-
-	std::vector<VkBuffer> m_UniformBuffers;
-	std::vector<VkDeviceMemory> m_UniformBufferMemory;
-
-	std::vector<VkBuffer> m_UniformDynamicBuffers;
-	std::vector<VkDeviceMemory> m_UniformDynamicBufferMemory;
-
-	VkDeviceSize m_MinUniformBufferOffset;
-	size_t m_ModelUniformAlignment;
-	UniformBufferObjectModel* m_ModelTransferSpace = nullptr;
-
-
-	// -- Assets
-	std::vector<MeshModel> m_ModelList;
-
-	std::vector<VkImage> m_TextureImages;
-	std::vector<VkDeviceMemory> m_TextureImageMemory;
-	std::vector<VkImageView> m_TextureImageViews;
-
-	// -- Pipeline
-	VkPipeline m_GraphicsPipeline;
-	VkPipelineLayout m_PipelineLayout;
-	VkRenderPass m_RenderPass;
-
-	VkPipeline m_SecondPipeline;
-	VkPipelineLayout m_SecondPipelineLayout;
-
-	// -- Pools
-	VkCommandPool m_GraphicsCommandPool;
-
-	// Utilities
-	VkFormat m_SwapchainImageFormat;
-	VkExtent2D m_SwapchainExtent;
-	
-	// - Synchronization
-	std::vector<VkSemaphore> m_SemaphoresImageAvailable;
-	std::vector<VkSemaphore> m_SemaphoresRenderFinished;
-	std::vector<VkFence> m_DrawFences;
 };
+
