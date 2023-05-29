@@ -109,6 +109,20 @@ void Camera::OnResize(uint32_t width, uint32_t height)
 	RecalculateView();
 }
 
+glm::mat3 Camera::GetTransposeInverseViewMatrix()
+{
+	// Initialize 3x3 matrix
+	glm::mat3 MnormalMtx;
+	for (uint32_t i = 0; i < 3; i++)
+	{
+		MnormalMtx[i].x = m_InverseView[i].x;
+		MnormalMtx[i].y = m_InverseView[i].y;
+		MnormalMtx[i].z = m_InverseView[i].z;
+	}
+
+	return glm::transpose(MnormalMtx);
+}
+
 void Camera::RecalculateProjection()
 {
 	m_Projection = glm::perspective(glm::radians(m_VerticalFOV),

@@ -18,6 +18,8 @@ public:
 	void SetCameraPositionAndDirection(glm::vec3& position, glm::vec3& fwdDirection) { m_Position = position; m_ForwardDirection = fwdDirection; }
 
 	glm::mat4& GetProjectionViewMatrix() { return m_Projection * m_View; }
+	glm::mat3 GetTransposeInverseViewMatrix();
+	glm::vec3& GetGazeDirection() { return m_ForwardDirection; }
 
 private:
 	void RecalculateProjection();

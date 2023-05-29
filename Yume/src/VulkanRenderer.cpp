@@ -756,7 +756,9 @@ void VulkanRenderer::CreateDescriptorSetLayout()
 	VkDescriptorSetLayoutBinding vpLayoutBinding = {};
 	vpLayoutBinding.binding = 0; // binding point in shader
 	vpLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; // type of descriptor
-	vpLayoutBinding.descriptorCount = 1;		// number of descriptor for binding
+	vpLayoutBinding.descriptorCount = 1;	
+
+	// number of descriptor for binding
 	vpLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;		// Shader stage to bind to
 	vpLayoutBinding.pImmutableSamplers = nullptr;			// Fopr texture: can make sampler data unchangeable (imutable) by specifying in layout
 
@@ -878,7 +880,7 @@ void VulkanRenderer::CreateGraphicsPipeline()
 																// VK_VERTEX_INPUT_RATE_INSTANCE: move to a vertex for next 
 
 	// How the data for an attribute is defined within a vertex
-	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions;
+	std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions;
 
 	// Position attribute
 	attributeDescriptions[0].binding = 0;
@@ -897,6 +899,12 @@ void VulkanRenderer::CreateGraphicsPipeline()
 	attributeDescriptions[2].location = 2;			// location in shader wherre data will be read from
 	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;  // format the data will take (also it helps define size opf data)
 	attributeDescriptions[2].offset = offsetof(Vertex, TextureCoords); // where this attribute is defined in the data for a single vertex
+
+	// Normal attribute
+	attributeDescriptions[3].binding = 0;
+	attributeDescriptions[3].location = 3;			// location in shader wherre data will be read from
+	attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;  // format the data will take (also it helps define size opf data)
+	attributeDescriptions[3].offset = offsetof(Vertex, NormalCoords); // where this attribute is defined in the data for a single vertex
 
 	// Create PIPELINE
 	// -- Vertex Input
@@ -1287,7 +1295,7 @@ void VulkanRenderer::CreateTextureSampler()
 void VulkanRenderer::CreateUniformBuffers()
 {
 	// Buffer size of view-projection
-	VkDeviceSize bufferSize = sizeof(Camera);
+	VkDeviceSize bufferSize = sizeof(CameraComponent);
 
 	// Dynamic uniform buffer size (model buffer)
 	VkDeviceSize modelBufferSize = s_ModelUniformAlignment * MAX_OBJECTS;
@@ -1418,7 +1426,7 @@ void VulkanRenderer::CreateDescriptorSets()
 		VkDescriptorBufferInfo vpBufferInfo = {};
 		vpBufferInfo.buffer = s_UniformBuffers[i];	// buffer to get data from
 		vpBufferInfo.offset = 0;					// Position of start of data
-		vpBufferInfo.range = sizeof(Camera);		// Size of data
+		vpBufferInfo.range = sizeof(CameraComponent);		// Size of data
 
 
 		// Data about connection between binding and buffer
@@ -1525,8 +1533,11 @@ void VulkanRenderer::CreateInputDescriptorSets()
 
 void VulkanRenderer::UpdateUniformBuffers(uint32_t imageIndex)
 {
-
-	auto CameraData = s_Scene.Camera.GetProjectionViewMatrix();
+	CameraComponent CameraData;
+	CameraData.ViewProjectionMatrix = s_Scene.Camera.GetProjectionViewMatrix();
+	CameraData.InverseTransposeViewMatrix = s_Scene.Camera.GetTransposeInverseViewMatrix();
+	CameraData.GazeDirection = s_Scene.Camera.GetGazeDirection();
+	// auto CameraData = s_Scene.Camera.GetProjectionViewMatrix();
 	// Copy uniform buffer (view-projection matrix)
 	void* data;
 	vkMapMemory(s_MainDevice.LogicalDevice, s_UniformBufferMemory[imageIndex], 0,

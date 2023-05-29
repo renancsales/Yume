@@ -117,7 +117,10 @@ Mesh MeshModel::LoadMesh(VkPhysicalDevice newPhysicaldDevice, VkDevice newDevice
 
 		if(mesh->HasNormals())
 		{
-			
+			// ensure that normals are normalized 
+			auto tempNormal = mesh->mNormals[i];
+			tempNormal = tempNormal.Normalize();
+			vertices[i].NormalCoords = { tempNormal.x, tempNormal.y, tempNormal.z };
 		}
 	}
 
