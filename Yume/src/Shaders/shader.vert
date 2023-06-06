@@ -33,5 +33,5 @@ void main()
 	fragTex = texCoords;
 	mat3 MVI = camera.inverseTransposeViewMatrix*transpose(inverse(mat3(modelMtx.model)));
 	v_normal = normalize(MVI*normalCoords);
-	v_gazeDirection = normalize(camera.gazeDirection);
+	v_gazeDirection = normalize(MVI*camera.gazeDirection);
 }

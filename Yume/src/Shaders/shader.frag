@@ -12,16 +12,17 @@ layout(set = 1, binding = 0) uniform sampler2D textureSampler;
 
 void main()
 {
-	vec3 lightDirection = normalize(vec3(0.5, 1.0, 0.5));
+	vec3 lightDirection = normalize(vec3(0.10, 1.0, 1.0));
 	float lightIntensity = 1.0;
+
 
 	// Set the ambience parameters
 	vec4 diffuseColor = texture(textureSampler,fragTex);
-	vec4 specularColor = vec4(1.0, 0.50, 1.0, 1.0);
-	vec4 ambienceColor = texture(textureSampler,fragTex);
-	float intensityAmbience = 0.65;
+	vec4 specularColor = vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 ambienceColor = diffuseColor; //texture(textureSampler,fragTex);
+	float intensityAmbience = 0.15;
 
-	outColor.rgb = vec3(0, 0, 0);
+	outColor.rgb = vec3(1, 0, 0);
 
 	// Blinn material model
 	float geometricTerm = dot(lightDirection, v_normal);
@@ -31,12 +32,12 @@ void main()
 		H = normalize(H);
 
 		float specularValue = dot(v_normal, H);
-		outColor.rgb = lightIntensity * (geometricTerm * diffuseColor.rgb + pow(specularValue, 1) * specularColor.rgb);
+		outColor.rgb = lightIntensity * (0*geometricTerm * diffuseColor.rgb + pow(specularValue, 10) * specularColor.rgb);
 	}
 
 	// Add ambience
-	outColor.rgb += intensityAmbience * ambienceColor.rgb + 0.10;
+	outColor.rgb += 0*intensityAmbience * ambienceColor.rgb ;
 	outColor.a = 1.0;
 	// outColor = texture(textureSampler,fragTex);
-	// outColor = vec4(v_normal, 1.0);
+	//outColor = vec4(v_normal, 1.0);
 }
